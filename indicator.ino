@@ -65,7 +65,7 @@ shift_stop (void)
 // on the rising edge of the clock,
 // clock idles low
 void
-shiftOut (byte data_out)
+shiftOut (short data_out)
 {
   int i;
   int pin_state;
@@ -75,7 +75,7 @@ shiftOut (byte data_out)
   write_data (0);
   shift_stop ();
 
-  for (i = 7; i >= 0; --i)
+  for (i = 15; i >= 0; --i)
     {
       shift_stop ();
 
@@ -104,20 +104,21 @@ shiftOut (byte data_out)
 enum STATE {
   STATE_DEFAULT = 0,
   STATE_NOTICE,
-  STATE_WARNING
+  STATE_WARNING,
+  STATE_TEST
 };
 
 void
 state_heartbeat (void)
 {
   latch ();
-  shiftOut ((byte) 0x05);
+  shiftOut ((unsigned short) 0x05);
   unlatch ();
 
   delay (200);
 
   latch ();
-  shiftOut ((byte) 0x00);
+  shiftOut ((unsigned short) 0x00);
   unlatch ();
 
   delay (1500);
@@ -172,6 +173,28 @@ state_warning (void)
   delay (1500);
 }
 
+void
+state_test (void)
+{
+  int i;
+  for (i = 0; i < 3; ++i)
+    {
+      latch ();
+//      shiftOut ((unsigned short) (0x02 << 8));
+      shiftOut ((unsigned short) (0xFFFF));
+      unlatch ();
+
+      delay (100);
+
+      latch ();
+      shiftOut ((unsigned short) 0x00);
+      unlatch ();
+
+      delay (500);
+    }
+      
+}
+
 
 /* Main loop */
 
@@ -201,6 +224,11 @@ loop (void)
           state_warning ();
           state = STATE_DEFAULT;
           break;
+          
+        case STATE_TEST:
+          state_test ();
+          state = STATE_DEFAULT;
+          break;   
         }
     }
 }
