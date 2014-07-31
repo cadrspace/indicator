@@ -197,13 +197,12 @@ state_test (void)
       delay (500);
     }
 */
-      
 }
 
 
 /*  LED Colors */
 
-enum COLOR 
+enum COLOR
 {
   GREEN = 1,
   BLUE,
@@ -217,117 +216,118 @@ enum COLOR
 /* LED Control */
 
 /* set current led pointed col and row to color state */
-void 
-set_led(int col, int row, int color)
+void
+set_led (int col, int row, int color)
 {
      word state = 0;
 
      // first - let's set row bits
      state = state + color;
-   
-     if( row > 0 && row < 5 ) {
-       if( row != 3 ) {
-         state = state << ( 3 * ( row - 1 )); 
-       } else {
-         state = state << ( 3 * row);
+
+     if ((row > 0) && (row < 5))
+       {
+         if (row != 3)
+           {
+             state = state << (3 * (row - 1));
+           }
+         else
+           {
+             state = state << (3 * row);
+           }
        }
-     }
-     
+
     //state = state | color;
 
     // second - set cols one
-     if( col > && col < 4 ) {
-       state = state | ( ~( 0x7 & ( 0x1 << ( col-1 ) ) ) << 13); //| 0x3000;
-     }
-     
-     digitalWrite( PIN_LATCH, LOW);
-     
+     if (col > && col < 4 )
+       {
+         state = state | (~(0x7 & (0x1 << (col - 1))) << 13); //| 0x3000;
+       }
+
+     digitalWrite (PIN_LATCH, LOW);
+
      // ... and using example from docs - shiftOut pushs 1 byte only!
      // we have a word type so push by parts 
-     
-     shiftOut( PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state >> 8) );  
-     shiftOut( PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state) );
-     digitalWrite( PIN_LATCH, HIGH);
-}
 
+     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state >> 8));
+     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state));
+     digitalWrite (PIN_LATCH, HIGH);
+}
 
 /* set the light off by every led */
 void
-clear_led(void) 
+clear_led (void)
 {
-    digitalWrite( PIN_LATCH, LOW);
-    shiftOut( PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0) );  
-    shiftOut( PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0) );
-    digitalWrite( PIN_LATCH, HIGH);
+    digitalWrite (PIN_LATCH, LOW);
+    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
+    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
+    digitalWrite (PIN_LATCH, HIGH);
 }
 
 
-/* led demo displays rotate line- one color by cycle. then unknown behavior - very impressive! */
+/* led demo displays rotate line- one color by cycle. then unknown
+   behavior - very impressive! */
 void
-led_demo()
+led_demo (void)
 {
 
   int d = 50;
   int dd = 10;
   int c = 0;
   int counter = 0;
-  
-  while ( true )
-  {
-  
-    set_led( 1, 1, c);
-    delay( dd );
-    set_led( 2, 2, c);
-    delay( dd );
-    set_led( 3, 3, c);
-    
-    delay( dd );
-    clear_led();
-    delay( dd );
-    delay( d );
-    
-    set_led( 2, 1, c);
-    delay( dd );
-    set_led( 2, 2, c);
-    delay( dd );
-    set_led( 2, 3, c);
-    
-    delay( dd );
-    clear_led();
-    delay( dd );
-    delay( d );
-    
-    set_led( 3, 1, c);
-    delay( dd );
-    set_led( 2, 2, c);
-    delay( dd );
-    set_led( 1, 3, c);
-    
-    delay( dd );
-    clear_led();
-    delay( dd );
-    delay( d );
-     
-    set_led( 1, 2, c );
-    delay( dd );
-    set_led( 2, 2, c);
-    delay( dd );
-    set_led( 3, 2, c);
-    
-    delay( dd );
-    clear_led();
-    delay( dd );
-    delay( d );
-    
-    if( !(counter % 10) ) {
-      c++;
+
+  while (true)
+    {
+      set_led (1, 1, c);
+      delay (dd);
+      set_led (2, 2, c);
+      delay (dd);
+      set_led (3, 3, c);
+
+      delay (dd);
+      clear_led ();
+      delay (dd);
+      delay (d);
+
+      set_led (2, 1, c);
+      delay (dd);
+      set_led (2, 2, c);
+      delay (dd);
+      set_led (2, 3, c);
+
+      delay (dd);
+      clear_led ();
+      delay (dd);
+      delay (d);
+
+      set_led (3, 1, c);
+      delay (dd);
+      set_led (2, 2, c);
+      delay (dd);
+      set_led (1, 3, c);
+
+      delay (dd);
+      clear_led ();
+      delay (dd);
+      delay (d);
+
+      set_led (1, 2, c);
+      delay (dd);
+      set_led (2, 2, c);
+      delay (dd);
+      set_led (3, 2, c);
+
+      delay (dd);
+      clear_led ();
+      delay (dd);
+      delay (d);
+
+      if(! (counter % 10))
+        c++;
+
+      counter++;
     }
-    counter++;
- 
-  }
-
 }
-
 
 
 /* Main loop */
@@ -358,11 +358,11 @@ loop (void)
           state_warning ();
           state = STATE_DEFAULT;
           break;
-          
+
         case STATE_TEST:
           state_test ();
           state = STATE_DEFAULT;
-          break;   
+          break;
         }
     }
 }
