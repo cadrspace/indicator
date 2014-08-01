@@ -31,7 +31,7 @@ if test "x$guilesitedir" = "x"; then
 fi
 AC_SUBST([guilesitedir])
 
-LIBGUILE_TERMIOS_INTERFACE="6:0:0"
+LIBGUILE_TERMIOS_INTERFACE="1:0:0"
 AC_SUBST(LIBGUILE_TERMIOS_INTERFACE)
 
 AC_CONFIG_FILES([Makefile am/Makefile termios/Makefile])
