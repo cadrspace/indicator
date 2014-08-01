@@ -239,7 +239,7 @@ set_led (int col, int row, int color)
     //state = state | color;
 
     // second - set cols one
-     if (col > && col < 4 )
+     if (col > 0 && col < 4 )
        {
          state = state | (~(0x7 & (0x1 << (col - 1))) << 13); //| 0x3000;
        }
