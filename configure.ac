@@ -34,7 +34,7 @@ AC_SUBST([guilesitedir])
 LIBGUILE_TERMIOS_INTERFACE="6:0:0"
 AC_SUBST(LIBGUILE_TERMIOS_INTERFACE)
 
-AC_CONFIG_FILES([Makefile termios/Makefile])
+AC_CONFIG_FILES([Makefile am/Makefile termios/Makefile])
 
 # Generate a Makefile, based on the results.
 AC_OUTPUT
