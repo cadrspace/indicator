@@ -1,0 +1,9 @@
+# Auxiliary directories
+.deps
+.libs
+
+# Auxiliary files
+*.la
+*.lo
+*.o
+*.x
