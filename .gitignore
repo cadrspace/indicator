@@ -2,3 +2,15 @@
 
 # Backup copies
 *.\~
+
+# Auxiliary directories
+autom4te.cache/
+
+# Auxiliary files
+config.status
+configure
+
+Makefile
+
+*.in
+*.log
