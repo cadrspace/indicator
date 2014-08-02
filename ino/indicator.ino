@@ -105,7 +105,7 @@ enum STATE {
   STATE_DEFAULT = 0,
   STATE_NOTICE,
   STATE_WARNING,
-  STATE_TEST
+  STATE_DEMO
 };
 
 void
@@ -172,33 +172,6 @@ state_warning (void)
 
   delay (1500);
 }
-
-void
-state_test (void)
-{
-
-  led_demo();
-
-/*
-  int i;
-  for (i = 0; i < 3; ++i)
-    {
-      latch ();
-//      shiftOut ((unsigned short) (0x02 << 8));
-      shiftOut ((unsigned short) (0xFFFF));
-      unlatch ();
-
-      delay (100);
-
-      latch ();
-      shiftOut ((unsigned short) 0x00);
-      unlatch ();
-
-      delay (500);
-    }
-*/
-}
-
 
 /*  LED Colors */
 
@@ -268,7 +241,7 @@ clear_led (void)
 /* led demo displays rotate line- one color by cycle. then unknown
    behavior - very impressive! */
 void
-led_demo (void)
+state_demo (void)
 {
 
   int d = 50;
@@ -359,8 +332,8 @@ loop (void)
           state = STATE_DEFAULT;
           break;
 
-        case STATE_TEST:
-          state_test ();
+        case STATE_DEMO:
+          state_demo ();
           state = STATE_DEFAULT;
           break;
         }
