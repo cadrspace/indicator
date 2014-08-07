@@ -81,7 +81,7 @@ SCM_DEFINE (gtermios_tcgetattr,
 #undef FUNC_NAME
 
 SCM_DEFINE (gtermios_tcsetattr_x,
-            "%tcsetattr", 2, 1, 0,
+            "%tcsetattr!", 2, 1, 0,
             (SCM termios, SCM fd, SCM optional_actions),
             "")
 #define FUNC_NAME s_gtermios_tcsetattr_x

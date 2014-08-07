@@ -5,7 +5,7 @@
             cfsetospeed!
             cfsetspeed!
             tcgetattr
-            tcsetattr
+            tcsetattr!
 
             ;; Constants
             B0
@@ -33,9 +33,11 @@
 stores them in the termios structure."
   (%tcgetattr fd))
 
-(define (tcsetattr termios fd . optional-actions)
+(define (tcsetattr! termios fd . optional-actions)
   "Set the parameters associated with the terminal."
-  (%tcsetattr termios, fd, optional-actions))
+  (if (not (null? optional-actions))
+      (%tcsetattr! termios fd optional-actions)
+      (%tcsetattr! termios fd)))
 
 
 (define (cfgetispeed termios)
