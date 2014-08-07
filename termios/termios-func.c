@@ -58,6 +58,17 @@ SCM_DEFINE (gtermios_cfsetospeed_x,
 }
 #undef FUNC_NAME
 
+
+SCM_DEFINE (gtermios_cfmakeraw_x,
+            "%cfmakeraw!", 1, 0, 0,
+            (SCM termios),
+            "")
+{
+  struct termios_data *td = _scm_to_termios_data (termios);
+  cfmakeraw (td->termios);
+}
+
+
 SCM_DEFINE (gtermios_tcgetattr,
             "%tcgetattr", 1, 0, 0,
             (SCM fd),

@@ -4,6 +4,7 @@
             cfsetispeed!
             cfsetospeed!
             cfsetspeed!
+            cfmakeraw!
             tcgetattr
             tcsetattr!
 
@@ -61,6 +62,14 @@ stores them in the termios structure."
   "Set both input and output SPEED for the TERMIOS object."
   (cfsetispeed! termios speed)
   (cfsetospeed! termios speed))
+
+
+(define (cfmakeraw! termios)
+  "Set the terminal to something like the \"raw\" mode of the old
+Version 7 terminal driver: input is available character by character,
+echoing is disabled, and all special processing of terminal input and
+output characters is disabled."
+  (%cfmakeraw! termios))
 
 ;;; termios.scm ends here
 
