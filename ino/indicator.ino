@@ -98,6 +98,69 @@ shiftOut (short data_out)
   shift_stop ();
 }
 
+/* LED Control */
+
+/*  LED Colors */
+enum COLOR
+{
+  GREEN = 1,
+  BLUE,
+  LBLUE,
+  RED,
+  ORANGE,
+  PINK,
+  WHITE
+};
+
+/* set current led pointed col and row to color state */
+void
+set_led (int col, int row, int color)
+{
+     word state = 0;
+
+     // first - let's set row bits
+     state = state + color;
+
+     if ((row > 0) && (row < 5))
+       {
+         if (row != 3)
+           {
+             state = state << (3 * (row - 1));
+           }
+         else
+           {
+             state = state << (3 * row);
+           }
+       }
+
+    //state = state | color;
+
+    // second - set cols one
+     if (col > 0 && col < 4 )
+       {
+         state = state | (~(0x7 & (0x1 << (col - 1))) << 13); //| 0x3000;
+       }
+
+     digitalWrite (PIN_LATCH, LOW);
+
+     // ... and using example from docs - shiftOut pushs 1 byte only!
+     // we have a word type so push by parts 
+
+     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state >> 8));
+     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state));
+     digitalWrite (PIN_LATCH, HIGH);
+}
+
+/* set the light off by every led */
+void
+clear_led (void)
+{
+    digitalWrite (PIN_LATCH, LOW);
+    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
+    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
+    digitalWrite (PIN_LATCH, HIGH);
+}
+
 
 /* States */
 
@@ -112,13 +175,13 @@ void
 state_heartbeat (void)
 {
   latch ();
-  shiftOut ((unsigned short) 0x05);
+  set_led (2, 2, ORANGE);
   unlatch ();
 
   delay (200);
 
   latch ();
-  shiftOut ((unsigned short) 0x00);
+  clear_led ();
   unlatch ();
 
   delay (1500);
@@ -172,71 +235,6 @@ state_warning (void)
 
   delay (1500);
 }
-
-/*  LED Colors */
-
-enum COLOR
-{
-  GREEN = 1,
-  BLUE,
-  LBLUE,
-  RED,
-  ORANGE,
-  PINK,
-  WHITE
-};
-
-/* LED Control */
-
-/* set current led pointed col and row to color state */
-void
-set_led (int col, int row, int color)
-{
-     word state = 0;
-
-     // first - let's set row bits
-     state = state + color;
-
-     if ((row > 0) && (row < 5))
-       {
-         if (row != 3)
-           {
-             state = state << (3 * (row - 1));
-           }
-         else
-           {
-             state = state << (3 * row);
-           }
-       }
-
-    //state = state | color;
-
-    // second - set cols one
-     if (col > 0 && col < 4 )
-       {
-         state = state | (~(0x7 & (0x1 << (col - 1))) << 13); //| 0x3000;
-       }
-
-     digitalWrite (PIN_LATCH, LOW);
-
-     // ... and using example from docs - shiftOut pushs 1 byte only!
-     // we have a word type so push by parts 
-
-     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state >> 8));
-     shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (state));
-     digitalWrite (PIN_LATCH, HIGH);
-}
-
-/* set the light off by every led */
-void
-clear_led (void)
-{
-    digitalWrite (PIN_LATCH, LOW);
-    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
-    shiftOut (PIN_DATA, PIN_CLK, MSBFIRST, (byte) (0));
-    digitalWrite (PIN_LATCH, HIGH);
-}
-
 
 /* led demo displays rotate line- one color by cycle. then unknown
    behavior - very impressive! */
