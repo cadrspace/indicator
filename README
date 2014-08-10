@@ -1,5 +1,8 @@
 # -*- mode: org; -*-
 
+"It's an indicator.  It understands everything, but doesn't speak.  It
+only changes colour." -- [[https://en.wikipedia.org/wiki/The_Mystery_of_the_Third_Planet]["The Mystery of the Third Planet"]]
+
 * Requirements
   - [[https://www.gnu.org/software/guile/][GNU Guile]] 2.0+
   - [[https://www.gnu.org/software/guile-rpc/][GNU Guile-RPC]]
