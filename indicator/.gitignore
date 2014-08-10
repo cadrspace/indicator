@@ -1,0 +1,13 @@
+# -*- mode: shell-script -*-
+
+# Indicator's input file for generating the executable must not be
+# ignored
+!indicator.in
+
+# Generated executable scripts
+indicator
+
+# Generated RPC files
+rpc-client.scm
+rpc-server.scm
+rpc-types+constants.scm

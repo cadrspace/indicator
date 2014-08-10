@@ -1,0 +1,87 @@
+#!/bin/sh
+# aside from this initial boilerplate, this is actually -*- scheme -*- code
+export GUILE_LOAD_PATH=__DATA_DIR__
+main='(module-ref (resolve-module '\''(indicator indicator)) '\'main')'
+exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
+!#
+
+;;; indicator.in -- Indicator
+
+(define-module (indicator indicator)
+  #:use-module (ice-9     rdelim)
+  #:use-module (ice-9     getopt-long)
+  #:use-module (indicator termios)
+  ;; RPC
+  #:use-module (rpc rpc)
+  #:use-module (rpc rpc server)
+  #:use-module (rpc xdr)
+  #:use-module (rpc xdr types)
+  #:use-module (indicator rpc-types+constants)
+  #:use-module (indicator rpc-server))
+
+
+;;; Constants
+
+(define %state-default 0)
+(define %state-notice  1)
+(define %state-warning 2)
+(define %state-demo    3)
+(define %state-custom  4)
+
+(define %default-port "12468")
+
+;;;
+
+(define (set-status status)
+  "Set Indicator STATUS."
+  'SUCCESS)
+
+(define (run-rpc-server server-socket)
+  "Run RPC server and bind it to the SERVER-SOCKET."
+  (let ((indicator-rpc-server (make-INDICATOR-PROGRAM-server
+                               `(("INDICATOR_VERSION"
+                                  ("set_status" . ,set-status)))))
+        (timeout    1000000)
+        (idle-thunk (lambda () #f)))
+    (run-stream-rpc-server (list (cons server-socket indicator-rpc-server))
+                           timeout
+                           #f               ;Close connections handler
+                           idle-thunk)))
+
+(define (open-server-socket address port)
+  "Open and bind the socket to the given ADDRESS and PORT.  Start
+listen to the socket and return it as the result."
+  (let ((server-socket (socket PF_INET SOCK_STREAM 0)))
+    (bind server-socket AF_INET INADDR_ANY port)
+    (listen server-socket 1)
+    server-socket))
+
+(define (print-help-and-exit)
+  "Print help message and exit."
+  (display "\
+Usage: indicator [options]
+
+Options:
+  --help, -h    Print this message and exit
+  --port, -p    Set RPC server port
+")
+  (exit))
+
+(define (main . args)
+  "Entry point of the program."
+
+  (let* ((option-spec '((help (single-char #\h) (value #f))
+                        (port (single-char #\p) (value #t))))
+         (options     (getopt-long args option-spec))
+         (help-wanted (option-ref options 'help #f))
+         (port        (option-ref options 'port %default-port)))
+
+    (and help-wanted
+         (print-help-and-exit))
+
+    (let ((server-socket (open-server-socket "localhost"
+                                             (string->number port))))
+      (format #t "Listening on port ~a ...~%" port)
+      (run-rpc-server server-socket))))
+
+;;; indicator.in ends here

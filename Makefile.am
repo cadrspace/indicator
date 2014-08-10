@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 --install
 
-SUBDIRS = am termios
+SUBDIRS = am termios indicator
 
 clean-go:
 	@cd ssh; make clean-go
