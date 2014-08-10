@@ -30,15 +30,35 @@ exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
 
 (define %default-port "12468")
 
-(define *device-port* #f)
+(define *device* #f)
 
 ;;;
 
 
+(define (open-and-configure-device device)
+  "Open serial port pointed by DEVICE path and convigure it.  Return
+the port."
+  (let* ((p       (open device (or O_RDWR O_NONBLOCK O_NDELAY)))
+         (fd      (port->fdes p))
+         (termios (tcgetattr fd)))
+
+  (cfsetspeed! termios B9600)
+  (cfmakeraw! termios)
+  (tcsetattr! termios fd)
+
+  (display (read-line p))
+  (newline)
+
+  p))
+
+
 (define (set-state state)
   "Set Indicator STATUS."
-  (display state *device-port*)
-  'SUCCESS)
+  (let ((p (open-and-configure-device *device*)))
+    (format #t "state: ~a~%" state)
+    (display state p)
+    (close p)
+    'SUCCESS))
 
 (define (run-rpc-server server-socket)
   "Run RPC server and bind it to the SERVER-SOCKET."
@@ -56,23 +76,10 @@ exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
   "Open and bind the socket to the given ADDRESS and PORT.  Start
 listen to the socket and return it as the result."
   (let ((server-socket (socket PF_INET SOCK_STREAM 0)))
+    (setsockopt server-socket SOL_SOCKET SO_REUSEADDR 1)
     (bind server-socket AF_INET INADDR_ANY port)
     (listen server-socket 1)
     server-socket))
-
-
-(define (open-and-configure-device device)
-  "Open serial port pointed by DEVICE path and convigure it.  Return
-the port."
-  (let* ((p       (open device O_RDWR))
-         (fd      (port->fdes p))
-         (termios (tcgetattr fd)))
-
-  (cfsetspeed! termios B9600)
-  (cfmakeraw! termios)
-  (tcsetattr! termios fd)
-
-  p))
 
 (define (print-help-and-exit)
   "Print help message and exit."
@@ -104,7 +111,7 @@ Options:
     (or device
         (error "Device must be specified (see `--device' option)"))
 
-    (set! *device-port* (open-and-configure-device device))
+    (set! *device* device)
 
     (let ((server-socket (open-server-socket "localhost"
                                              (string->number port))))
