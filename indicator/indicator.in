@@ -35,16 +35,16 @@ exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
 ;;;
 
 
-(define (set-status status)
+(define (set-state state)
   "Set Indicator STATUS."
-  (display status *device-port*)
+  (display state *device-port*)
   'SUCCESS)
 
 (define (run-rpc-server server-socket)
   "Run RPC server and bind it to the SERVER-SOCKET."
   (let ((indicator-rpc-server (make-INDICATOR-PROGRAM-server
                                `(("INDICATOR_VERSION"
-                                  ("set_status" . ,set-status)))))
+                                  ("set_state" . ,set-state)))))
         (timeout    1000000)
         (idle-thunk (lambda () #f)))
     (run-stream-rpc-server (list (cons server-socket indicator-rpc-server))
