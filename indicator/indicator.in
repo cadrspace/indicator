@@ -20,7 +20,7 @@ exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
   #:use-module (indicator rpc-server))
 
 
-;;; Constants
+;;; Global symbols
 
 (define %state-default 0)
 (define %state-notice  1)
@@ -30,10 +30,14 @@ exec ${GUILE-guile} -l $0 -c "(apply $main (command-line))" "$@"
 
 (define %default-port "12468")
 
+(define *device-port* #f)
+
 ;;;
 
+
 (define (set-status status)
   "Set Indicator STATUS."
+  (display status *device-port*)
   'SUCCESS)
 
 (define (run-rpc-server server-socket)
@@ -56,6 +60,20 @@ listen to the socket and return it as the result."
     (listen server-socket 1)
     server-socket))
 
+
+(define (open-and-configure-device device)
+  "Open serial port pointed by DEVICE path and convigure it.  Return
+the port."
+  (let* ((p       (open device O_RDWR))
+         (fd      (port->fdes p))
+         (termios (tcgetattr fd)))
+
+  (cfsetspeed! termios B9600)
+  (cfmakeraw! termios)
+  (tcsetattr! termios fd)
+
+  p))
+
 (define (print-help-and-exit)
   "Print help message and exit."
   (display "\
@@ -64,20 +82,29 @@ Usage: indicator [options]
 Options:
   --help, -h    Print this message and exit
   --port, -p    Set RPC server port
+  --device, -d  Path to the serial port to which Indicator is connected
 ")
   (exit))
 
+
 (define (main . args)
   "Entry point of the program."
 
-  (let* ((option-spec '((help (single-char #\h) (value #f))
-                        (port (single-char #\p) (value #t))))
+  (let* ((option-spec '((help   (single-char #\h) (value #f))
+                        (port   (single-char #\p) (value #t))
+                        (device (single-char #\d) (value #t))))
          (options     (getopt-long args option-spec))
          (help-wanted (option-ref options 'help #f))
-         (port        (option-ref options 'port %default-port)))
+         (port        (option-ref options 'port %default-port))
+         (device      (option-ref options 'device #f)))
 
     (and help-wanted
          (print-help-and-exit))
+
+    (or device
+        (error "Device must be specified (see `--device' option)"))
+
+    (set! *device-port* (open-and-configure-device device))
 
     (let ((server-socket (open-server-socket "localhost"
                                              (string->number port))))
