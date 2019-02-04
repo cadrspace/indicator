@@ -1,0 +1,10 @@
+= Indcator Arduino Library =
+
+This library is realization of dynamical mode to control RGB LED matrix.
+
+For more information about this library please ask somebody in
+http://cadrspace.ru
+
+== License ==
+
+The license description must be here
