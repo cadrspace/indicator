@@ -1,4 +1,4 @@
-= Indcator Arduino Library =
+= Indicator Arduino Library =
 
 This library is realization of dynamical mode to control RGB LED matrix.
 
